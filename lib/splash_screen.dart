@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:todoapp/log_in.dart';
@@ -21,10 +22,16 @@ class _SplashScreenState extends State<SplashScreen> {
     // TODO: implement initState
     super.initState();
     Timer(Duration(seconds: 3),() async{
-      final prefs = await SharedPreferences.getInstance();
-      bool onboardingDone = prefs.getBool('onboardingDone') ?? false;
-      Navigator.pushReplacement(context, MaterialPageRoute(
-        builder: (context)=> onboardingDone ? LogIn() : OnboardingScreen(),));
+      final user = FirebaseAuth.instance.currentUser;
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) => user == null
+              ? const OnboardingScreen()
+              : const HomeScreen(),
+        ),
+      );
     });
   }
   @override
