@@ -55,7 +55,7 @@ class _SplashScreenState extends State<SplashScreen> {
             SizedBox(height: 130,),
             Image.asset('assets/images/check.png'),
             SizedBox(height: 30,),
-            Text("DO IT now", style: TextStyle(
+            Text("DO IT", style: TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 40,
               color: Colors.white
