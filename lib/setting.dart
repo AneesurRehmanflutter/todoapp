@@ -123,45 +123,7 @@ class _SettingState extends State<Setting> {
                 ),
                 Divider(color: Colors.blueGrey),
                 SizedBox(height: 80),
-                SizedBox(width: 260,
-                  height: 62,
-                  child: OutlinedButton.icon(
-                    onPressed: isLoading ? null :
-                        () async{
-                      setState(() {
-                        isLoading = true;
-                      });
-                      try {
-                        await FirebaseAuth.instance.signOut();
-                        ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text("Log Out Succesfully")));
-                        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> LogIn()));
-                      }
-                      catch(e){
-                        ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text("Logout Field Please Try Again"),
-                            )
-                        );
-                      }finally{
-                        setState(() {
-                          isLoading= false;
-                        });
-                      }
-                    },
-                    icon: isLoading ? SizedBox(height: 20,
-                      width: 20,
-                      child: CircularProgressIndicator(
-                        color: Color(0xff05243E),
-                        strokeWidth: 2,
-                      ),
-                    ) :
-                    Icon(Icons.logout_outlined, color: Colors.red, size: 30,),
-                    label: isLoading ? Text("") : Text("Logout", style: TextStyle(color: Colors.red, fontSize: 20, fontWeight: FontWeight.w500,
-                    ),
-                    ),
-                    style:OutlinedButton.styleFrom(backgroundColor: Colors.white),
-                  ),
-                )],
+                ],
             ),
           ),
         ),

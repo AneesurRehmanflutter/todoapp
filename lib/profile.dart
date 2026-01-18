@@ -6,6 +6,8 @@ import 'dart:io';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:todoapp/main.dart';
 
+import 'log_in.dart';
+
 class Profile extends StatefulWidget {
   const Profile({super.key});
 
@@ -253,19 +255,58 @@ child: Column( mainAxisAlignment: MainAxisAlignment.center,
 ListTile(
   leading: Icon(Icons.people,color: Colors.white,size: 25,),
   title: Text("Name",style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold, fontSize: 17),),
-  subtitle: Text(userName ?? "Loading...",style: TextStyle(color: Colors.white,fontSize: 15 ),),
+  subtitle: Text(userName ?? "username",style: TextStyle(color: Colors.white,fontSize: 15 ),),
 ),
     SizedBox(height: 10,),
     ListTile(
       leading: Icon(Icons.email,color: Colors.white,size: 25,),
       title: Text("Email address",style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold, fontSize: 17),),
-      subtitle: Text(userEmail ?? "Loading...",style: TextStyle(color: Colors.white,fontSize: 15 ),),
+      subtitle: Text(userEmail ?? "user@gmail.com",style: TextStyle(color: Colors.white,fontSize: 15 ),),
     ),
     SizedBox(height: 10,),
     ListTile(
       leading: Icon(Icons.emoji_emotions,color: Colors.white,size: 25,),
       title: Text("About",style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold, fontSize: 17),),
       subtitle: Text("Bio",style: TextStyle(color: Colors.white,fontSize: 15 ),),
+    ),
+    SizedBox(width: 260,
+      height: 62,
+      child: OutlinedButton.icon(
+        onPressed: loading ? null :
+            () async{
+          setState(() {
+            loading = true;
+          });
+          try {
+            await FirebaseAuth.instance.signOut();
+            ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text("Log Out Successfully")));
+            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> LogIn()));
+          }
+          catch(e){
+            ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text("Logout Field Please Try Again"),
+                )
+            );
+          }finally{
+            setState(() {
+              loading= false;
+            });
+          }
+        },
+        icon: loading ? SizedBox(height: 20,
+          width: 20,
+          child: CircularProgressIndicator(
+            color: Color(0xff05243E),
+            strokeWidth: 2,
+          ),
+        ) :
+        Icon(Icons.logout_outlined, color: Colors.red, size: 30,),
+        label: loading ? Text("") : Text("Logout", style: TextStyle(color: Colors.red, fontSize: 20, fontWeight: FontWeight.w500,
+        ),
+        ),
+        style:OutlinedButton.styleFrom(backgroundColor: Colors.white),
+      ),
     )
   ],
 ),
