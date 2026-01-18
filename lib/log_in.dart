@@ -92,7 +92,7 @@ class _LogInState extends State<LogIn> {
                      Row(mainAxisAlignment: MainAxisAlignment.center,
                        children: [
                          Text("Welcome Back to ",style: TextStyle( fontSize: 25, color: Colors.white),),
-                         Text(" DO IT now",style: TextStyle(fontSize: 25,fontWeight: FontWeight.bold, color: Colors.white),)
+                         Text(" DO IT",style: TextStyle(fontSize: 25,fontWeight: FontWeight.bold, color: Colors.white),)
                        ],
                      ),
                      Text("Have an other productive day !", style: TextStyle(fontSize: 18,color: Colors.white),),
