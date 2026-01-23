@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:todoapp/homescreen.dart';
 import 'package:todoapp/listscreen.dart';
 import 'package:todoapp/log_in.dart';
@@ -7,6 +8,7 @@ import 'package:todoapp/setting.dart';
 import 'package:todoapp/calender.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:todoapp/splash_screen.dart';
+import 'package:todoapp/task_provider_class.dart';
 import 'firebase_options.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -19,9 +21,15 @@ void main() async{
       url: 'https://rfxdfkiremxelfbpoyha.supabase.co',
       anonKey: 'sb_publishable_bX9dQGHjQGwvuEwtG6lvpw_-hlyOvbD');
 
-  runApp(MaterialApp(
-    home: SplashScreen(),
-  ));
+  runApp(MultiProvider(
+    providers:[ ChangeNotifierProvider(
+      create: (_)=> TaskProviderClass()),
+      ],
+      child: MaterialApp(
+        home: SplashScreen(),
+      ),
+    ),
+  );
 }
 
 class HomeScreen extends StatefulWidget {

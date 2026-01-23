@@ -91,7 +91,7 @@ class _LogInState extends State<LogIn> {
                      SizedBox(height: 10,),
                      Row(mainAxisAlignment: MainAxisAlignment.center,
                        children: [
-                         Text("Welcome Back to Pakistan",style: TextStyle( fontSize: 25, color: Colors.white),),
+                         Text("Welcome Back to",style: TextStyle( fontSize: 25, color: Colors.white),),
                          Text(" DO IT",style: TextStyle(fontSize: 25,fontWeight: FontWeight.bold, color: Colors.white),)
                        ],
                      ),
