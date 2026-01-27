@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -77,7 +78,7 @@ class _ProfileState extends State<Profile> {
             ),
             ),
             onTap: ()async {
-              Navigator.pop(context);
+            Get.back();
               final XFile? image = await picker.pickImage(source: ImageSource.camera);
             if( image != null){
               setState(() {
@@ -95,7 +96,7 @@ class _ProfileState extends State<Profile> {
                 color: Colors.white
             )),
             onTap:  ()async {
-              Navigator.pop(context);
+            Get.back();
               final XFile? image = await picker.pickImage(source: ImageSource.gallery);
               if( image != null){
                 setState(() {
@@ -113,7 +114,8 @@ class _ProfileState extends State<Profile> {
                 color: Colors.white
             )), 
             onTap: ()async{
-             try{ Navigator.pop(context);
+             try{
+               Get.back();
               await FirebaseFirestore.instance.collection('user').doc(user!.uid).update({
               'profile_image': FieldValue.delete(),
               }
@@ -176,7 +178,7 @@ class _ProfileState extends State<Profile> {
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.pop(context);
+                Get.back();
                 setState(() {
                   _imageFile = null;
                 });
@@ -185,7 +187,7 @@ class _ProfileState extends State<Profile> {
             ),
             ElevatedButton(
               onPressed: () async {
-                Navigator.pop(context); // YES
+                Get.back();
                 await uploadImage();
               },
               child: const Text("Yes"),
@@ -204,7 +206,7 @@ class _ProfileState extends State<Profile> {
         backgroundColor: Color(0xff1253AA),
         leading: IconButton(
             onPressed: () {
-              Navigator.pop(context);
+              Get.back();
             }, icon:Icon(Icons.arrow_back_ios,color: Color(0xff63D9F3))
         ),),
 body: Container(
@@ -281,7 +283,7 @@ ListTile(
             await FirebaseAuth.instance.signOut();
             ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(content: Text("Log Out Successfully")));
-            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> LogIn()));
+          Get.off(LogIn());
           }
           catch(e){
             ScaffoldMessenger.of(context).showSnackBar(

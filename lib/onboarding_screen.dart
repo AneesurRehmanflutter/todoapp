@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:introduction_screen/introduction_screen.dart';
 import 'package:todoapp/log_in.dart';
 import 'package:todoapp/main.dart';
@@ -105,8 +106,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             final prefs = await SharedPreferences.getInstance();
             await prefs.setBool('onboardingDone', true);
 
-            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> LogIn()));
-          },
+         Get.to(LogIn());
+         },
         ),
       ),
     );

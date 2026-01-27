@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:todoapp/homescreen.dart';
 import 'package:todoapp/listscreen.dart';
 import 'package:todoapp/log_in.dart';
@@ -9,6 +10,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:todoapp/splash_screen.dart';
 import 'firebase_options.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'getx_controller_class.dart';
+import 'package:get/get.dart';
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,7 +22,8 @@ void main() async{
       url: 'https://rfxdfkiremxelfbpoyha.supabase.co',
       anonKey: 'sb_publishable_bX9dQGHjQGwvuEwtG6lvpw_-hlyOvbD');
 
-  runApp(MaterialApp(
+
+  runApp(GetMaterialApp(
     home: SplashScreen(),
   ));
 }

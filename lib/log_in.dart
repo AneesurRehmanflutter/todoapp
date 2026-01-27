@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:todoapp/Sign_up.dart';
 import 'package:todoapp/forgot_screen.dart';
 import 'package:todoapp/main.dart';
+import 'package:get/get.dart';
 
 class LogIn extends StatefulWidget {
   const LogIn({super.key});
@@ -42,7 +43,7 @@ class _LogInState extends State<LogIn> {
       if(!mounted) return;
 
       if(login.user!.emailVerified){
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>HomeScreen()));
+       Get.offAll(HomeScreen());
       }
       else{
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("First verify your email")));
@@ -155,7 +156,8 @@ class _LogInState extends State<LogIn> {
                      SizedBox(height: 3,),
                      Align(alignment: Alignment.bottomRight,
                        child: TextButton(onPressed: (){
-                         Navigator.push(context, MaterialPageRoute(builder: (context)=> ForgotScreen()));
+                         Get.to(ForgotScreen());
+
                        },
                            child:Text("forget password?",style: TextStyle(
                              decoration: TextDecoration.underline,
@@ -186,7 +188,7 @@ class _LogInState extends State<LogIn> {
                        children: [
                          Text("Don't have an account ?",style: TextStyle(color: Colors.white),),
                        TextButton(onPressed: (){
-                         Navigator.push(context, MaterialPageRoute(builder: (context)=> SignUp()));
+                        Get.to(SignUp());
                        },
                            child: Text("Sign up",style: TextStyle(color: Color(0xff63D9F3)))
                        )

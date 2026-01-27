@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:todoapp/log_in.dart';
 import 'package:todoapp/profile.dart';
 
@@ -19,7 +20,7 @@ class _SettingState extends State<Setting> {
         backgroundColor: Color(0xff1253AA),
         leading: IconButton(
             onPressed: (){
-              Navigator.pop(context);
+            Get.back();
             },
             icon:Icon(Icons.arrow_back_ios,color: Color(0xff63D9F3))),
         title: Text("Settings",style: TextStyle(color:Colors.white, fontWeight: FontWeight.bold),),
@@ -53,10 +54,7 @@ class _SettingState extends State<Setting> {
                     Spacer(),
                     IconButton(
                       onPressed: ()async{
-                        final result = await Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (_) => const Profile()),
-                        );
+                        final result = await Get.to(Profile());
 
                         if (result == true) {
                           setState(() {

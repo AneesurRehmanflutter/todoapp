@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:todoapp/getx_controller_class.dart';
 import 'package:todoapp/listscreen.dart';
 import 'package:todoapp/main.dart';
 import 'package:todoapp/model_class.dart';
@@ -19,19 +21,16 @@ class _CalenderState extends State<Calender> {
   final TextEditingController dateController = TextEditingController();
   final TextEditingController timeController = TextEditingController();
 
-
-  DateTime _focusedDay = DateTime.now();
-  DateTime? _selectedDay;
-  bool isLoading = false;
+getxcontroller controller = Get.find<getxcontroller>();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text("Manage your time",style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold,fontSize: 18)),
         backgroundColor: Color(0xff1253AA),
-          leading: IconButton( 
+          leading: IconButton(
               onPressed: () {
-                Navigator.pop(context);
+               Get.back();
               }, icon:Icon(Icons.arrow_back_ios,color: Color(0xff63D9F3))
               ),),
       body: Container(
@@ -66,47 +65,57 @@ class _CalenderState extends State<Calender> {
                         ),
                           borderRadius: BorderRadius.circular(15)
                       ),
-                      child: TableCalendar(
-                        focusedDay: _focusedDay,
+                      child: Obx(
+                              ()=> TableCalendar(
+                        focusedDay: controller.focusedDay.value,
                         firstDay: DateTime(1900), lastDay:DateTime(2100),
+
                         selectedDayPredicate: (day) =>
-                            isSameDay(_selectedDay, day),
-                        onDaySelected: (selectedDay, focusedDay){
-                        setState(() {
-                          _selectedDay=selectedDay;
-                          _focusedDay=focusedDay;
-                          if(_selectedDay != null){
-                            setState(() {
-                              dateController.text= "Set a task for ${selectedDay.day}-${selectedDay.month}-${selectedDay.year}";
-                            });
-                          }
-                        });
+                            isSameDay(controller.selectedDay.value, day),
+
+                        onDaySelected: (selectedDay, focusedDay) {
+                          controller.selectedDay.value = selectedDay;
+                          controller.focusedDay.value = focusedDay;
+
+                          dateController.text =
+                          "Set a task for ${selectedDay.day}-${selectedDay
+                              .month}-${selectedDay.year}";
                         },
                         calendarStyle: CalendarStyle(
-                          outsideTextStyle: TextStyle(color: Colors.white70),
-                          defaultTextStyle: TextStyle(color: Colors.white),
-                          weekendTextStyle: TextStyle(color: Colors.blue),
-                          todayTextStyle: TextStyle(color: Colors.white),
-                          todayDecoration: BoxDecoration(color: Colors.blue, shape: BoxShape.circle),
-                          selectedDecoration: BoxDecoration(color: Colors.lightBlue,
-                          shape: BoxShape.circle)
+                                outsideTextStyle: TextStyle(
+                                    color: Colors.white70),
+                                defaultTextStyle: TextStyle(
+                                    color: Colors.white),
+                                weekendTextStyle: TextStyle(color: Colors.blue),
+                                todayTextStyle: TextStyle(color: Colors.white),
+                                todayDecoration: BoxDecoration(
+                                    color: Colors.blue, shape: BoxShape.circle),
 
+                                selectedDecoration: BoxDecoration(
+                                    color: Colors.lightBlue,
+                                    shape: BoxShape.circle)
+
+                            ),
+                            headerStyle:
+                            HeaderStyle(
+                                formatButtonVisible: false,
+                                titleCentered: true,
+                                titleTextStyle: TextStyle(color: Colors.white),
+                                leftChevronIcon: Icon(
+                                  Icons.chevron_left, color: Colors.blue,),
+                                rightChevronIcon: Icon(
+                                  Icons.chevron_right, color: Colors.blue,)
+                            ),
+                            daysOfWeekStyle:
+                            DaysOfWeekStyle(
+                                weekdayStyle: TextStyle(color: Colors.white),
+                                weekendStyle: TextStyle(color: Colors.blue)
+                            )
                         ),
-                        headerStyle: HeaderStyle(
-                          formatButtonVisible: false,
-                          titleCentered: true,
-                          titleTextStyle: TextStyle(color: Colors.white),
-                          leftChevronIcon: Icon(Icons.chevron_left,color: Colors.blue,),
-                          rightChevronIcon: Icon(Icons.chevron_right,color: Colors.blue,)
-                        ),
-                        daysOfWeekStyle: DaysOfWeekStyle(
-                          weekdayStyle: TextStyle(color: Colors.white),
-                          weekendStyle: TextStyle(color: Colors.blue)
-                        ),
-                      ),
+                    ),
                     ),
                   ),
-                  SizedBox(height: 10,),
+                      SizedBox(height: 10,),
                   Container(
                     decoration: BoxDecoration(
                       color: Colors.white,
@@ -116,12 +125,12 @@ class _CalenderState extends State<Calender> {
                       padding:  EdgeInsets.only(left: 15, right: 15, top: 15, bottom: 15),
                       child: Column(
                         children: [
-                      TextField(
+                     Obx(()=> TextField(
                         controller: dateController,
                          readOnly: true,
                           decoration : InputDecoration(
-                            hintText: _selectedDay != null
-                              ? "Set a task for ${_selectedDay!.day}-${_selectedDay!.month}-${_selectedDay!.year}"
+                            hintText: controller.selectedDay.value != null
+                              ? "Set a task for ${controller.selectedDay.value!.day}-${controller.selectedDay.value!.month}-${controller.selectedDay.value!.year}"
                               : "Set a task for this date",
                           border: InputBorder.none,
                         ),
@@ -130,6 +139,7 @@ class _CalenderState extends State<Calender> {
                           fontSize: 16,
                         ),
                       ),
+                  ),
                           Row( mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Expanded(
@@ -152,7 +162,7 @@ class _CalenderState extends State<Calender> {
                                 ),
                               ),
                               SizedBox(width: 5,),
-                              ElevatedButton(onPressed: isLoading ? null : ()async{
+                             Obx(()=> ElevatedButton(onPressed: controller.isloading.value ? null : ()async{
                                 if (titleController.text.trim().isEmpty) {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(
@@ -162,9 +172,9 @@ class _CalenderState extends State<Calender> {
                                   );
                                   return;
                                 }
-                                setState(() {
-                                  isLoading = true;
-                                });
+
+                                  controller.isloading.value = true;
+
                                   try {
                                     String id =FirebaseFirestore.instance
                                         .collection("user")
@@ -184,7 +194,7 @@ class _CalenderState extends State<Calender> {
                                     descriptionController.clear();
                                     dateController.clear();
                                     timeController.clear();
-                                    
+
 
                                  await  FirebaseFirestore.instance.collection(
                                         "user")
@@ -200,20 +210,15 @@ class _CalenderState extends State<Calender> {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                         const SnackBar(content: Text("Task added Successfully"), backgroundColor: Colors.green)
                                     );
-
-                                    Navigator.pushAndRemoveUntil(
-                                      context,
-                                      MaterialPageRoute(builder: (context) => const HomeScreen()),
-                                          (route) => false,
-                                    );
+                                    Get.offAll(HomeScreen());
                                   }
                                   catch (e) {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                         SnackBar(content: Text("Error: ${e.toString()}")));
                                   }finally{
-                                    setState(() {
-                                      isLoading = false;
-                                    });
+
+                                      controller.isloading.value= false;
+
                                   }
                                 },
 
@@ -221,7 +226,7 @@ class _CalenderState extends State<Calender> {
                                     backgroundColor: Color(0xff05243E),
                                     textStyle: TextStyle(color: Colors.white)
                                   ),
-                                  child: isLoading ? SizedBox(
+                                  child: controller.isloading.value ? SizedBox(
                                     height: 20,
                                       width: 20,
                                       child: CircularProgressIndicator(
@@ -229,12 +234,13 @@ class _CalenderState extends State<Calender> {
                                           strokeWidth: 2,),
                                   )
                                           : Text("Submit",style: TextStyle(color: Colors.white),))
+                             )
                             ],
                           )
-                        ],
+                     ]
+                      )
                       ),
                     ),
-                  )
                 ],
               ),
             ),

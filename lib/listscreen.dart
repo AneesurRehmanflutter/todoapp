@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:todoapp/calender.dart';
+import 'package:todoapp/getx_controller_class.dart';
 import 'package:todoapp/homescreen.dart';
 import 'package:todoapp/model_class.dart';
 import 'package:todoapp/setting.dart';
@@ -18,6 +20,7 @@ class Listscreen extends StatefulWidget {
 class _ListScreenState extends State<Listscreen> {
   final TextEditingController searchController= TextEditingController();
   final _formkey = GlobalKey<FormState>();
+  getxcontroller controller = Get.put(getxcontroller());
 
   String searchText= "";
 
@@ -60,9 +63,9 @@ class _ListScreenState extends State<Listscreen> {
                               )
                                 ),
                                 onChanged: (value){
-                                  setState(() {
-                                    searchText = value.toLowerCase();
-                                  });
+                                  controller.searchQuery.value =value;
+                                  controller.search.assignAll(
+                                      controller.allTask.where((task) => task.title.toLowerCase().contains(value.toLowerCase())).toList());
                                 },
                               ),
                             ), SizedBox(width: 20,),
@@ -81,35 +84,25 @@ class _ListScreenState extends State<Listscreen> {
                         ),
                       ),
                   Expanded(
-                    child: StreamBuilder<QuerySnapshot>(
-                    stream: FirebaseFirestore.instance
-                        .collection("user")
-                        .doc(FirebaseAuth.instance.currentUser?.uid)
-                        .collection("task")
-                        .snapshots(), // for subcollection or user collection
-                    //FirebaseFirestore.instance.collection("user").snapshots(),
-                        builder:(context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
+                   child: Obx(() {
+                      if (controller.isloading.value) {
                     return Center(child: CircularProgressIndicator(color: Colors.white,));
                       }
-                      if (snapshot.hasError) {
-                    return Center(child: Text(snapshot.error.toString(), style: TextStyle(color: Colors.white),));
-                      }
-                      if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                      if (controller.allTask.isEmpty) {
                     return Center(child: Text("no data found", style: TextStyle(color: Colors.white),));
                       }
-
-                      final alltask = snapshot.data!.docs;
-
-                      final filteredtask = alltask.where((doc){
-                        final title= (doc.data() as Map<String, dynamic>)["title"].toString().toLowerCase();
-                        return title.contains(searchText);
-                      }).toList();
+                      //
+                      // final alltask = snapshot.data!.docs;
+                      //
+                      // final filteredtask = alltask.where((doc){
+                      //   final title= (doc.data() as Map<String, dynamic>)["title"].toString().toLowerCase();
+                      //   return title.contains(searchText);
+                      // }).toList();
 
                       return ListView.builder(
-                    itemCount: filteredtask.length,
+                    itemCount: controller.search.length,
                     itemBuilder: (context, int index) {
-                      Task model = Task.fromJson(filteredtask[index].data() as Map<String, dynamic>);
+                      final model = controller.search[index];
                       return Padding(
                         padding:  EdgeInsets.only(top: 20),
                         child: Center(
@@ -120,7 +113,7 @@ class _ListScreenState extends State<Listscreen> {
                                 trailing: IconButton(
                                   icon: Icon(Icons.arrow_forward_ios),
                                   onPressed: (){
-                                    Navigator.push(context, MaterialPageRoute<void>(builder: (context)=> TaskDetails(task: model)));
+                                   Get.to(TaskDetails(task: model));
 
                                   },
                                 ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:get/get.dart';
 import 'package:todoapp/log_in.dart';
 class ForgotScreen extends StatefulWidget {
   const ForgotScreen({super.key});
@@ -18,7 +19,7 @@ class _ForgotScreenState extends State<ForgotScreen> {
       backgroundColor: Color(0xff1253AA),
       leading: IconButton(
           onPressed: (){
-            Navigator.pop(context);
+         Get.back();
           },
           icon:Icon(Icons.arrow_back_ios,color: Color(0xff63D9F3))),
       title: Text("Forgot Password",style: TextStyle(color:Colors.white, fontWeight: FontWeight.bold),),
@@ -59,7 +60,7 @@ class _ForgotScreenState extends State<ForgotScreen> {
                      try {
                        await FirebaseAuth.instance.sendPasswordResetEmail(
                            email: emailController.text.toString());
-                       Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>LogIn()));
+                     Get.off(LogIn());
 
                      } catch(e){ ScaffoldMessenger.of(context).showSnackBar(SnackBar
                        (content: Text(e.toString())));

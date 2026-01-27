@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:todoapp/log_in.dart';
+import 'package:get/get.dart';
 
 class SignUp extends StatefulWidget {
   const SignUp({super.key});
@@ -65,9 +66,8 @@ class _SignUpState extends State<SignUp> {
      );
    await Future.delayed(Duration(seconds: 3));{
       if(mounted){
-        Navigator.pop(context);
-      Navigator.pushReplacement((context),
-      MaterialPageRoute(builder: (context) => LogIn()));
+     Get.back();
+     Get.off(LogIn());
       }
     }
     }on FirebaseAuthException catch(e){
@@ -221,7 +221,7 @@ class _SignUpState extends State<SignUp> {
                     children: [
                       Text("Already have an account?",style: TextStyle(color: Colors.white),),
                       TextButton(onPressed: (){
-                        Navigator.push(context, MaterialPageRoute(builder: (context)=> LogIn()));
+                       Get.to(LogIn());
                       },
                           child: Text("Sign in",style: TextStyle(color: Color(0xff63D9F3)),))
                     ],

@@ -1,48 +1,22 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:todoapp/getx_controller_class.dart';
 import 'package:todoapp/task_details.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:todoapp/model_class.dart';
+import 'package:get/get.dart';
+import 'getx_controller_class.dart';
 
 class Homescreen extends StatefulWidget {
-  const Homescreen({super.key});
+
+  Homescreen({super.key});
 
   @override
   State<Homescreen> createState() => _HomescreenState();
 }
 
 class _HomescreenState extends State<Homescreen> {
-  String? profileImageUrl;
-  String? userName;
-  final user= FirebaseAuth.instance.currentUser;
-  bool isProfileLoading = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _fetchUserProfile();
-  }
-
-  void _fetchUserProfile() async {
-    try {
-      var snapshot = await FirebaseFirestore.instance
-          .collection("user")
-          .doc(user!.uid)
-          .get();
-
-      if (mounted && snapshot.exists) {
-        setState(() {
-          var data = snapshot.data();
-          profileImageUrl = data?['profile_image'];
-          userName = data?['name'] ?? user?.displayName;
-          isProfileLoading = false;
-        });
-      }
-    } catch (e) {
-      debugPrint("Error fetching profile: $e");
-      if (mounted) setState(() => isProfileLoading = false);
-    }
-  }
+  getxcontroller controller = Get.put(getxcontroller());
 
   Widget build(BuildContext context) {
     return  SafeArea(
@@ -63,30 +37,33 @@ class _HomescreenState extends State<Homescreen> {
             child: Column(crossAxisAlignment: CrossAxisAlignment.start,
               children: [SizedBox(height: 20,),
 
-                isProfileLoading
-                    ? const Center(child: CircularProgressIndicator(color: Colors.white))
-                    : ListTile(
-                  contentPadding: EdgeInsets.zero,
-                  leading: CircleAvatar(
-                    radius: 20,
-                    backgroundColor: const Color(0xff05243E),
-                    backgroundImage: profileImageUrl != null
-                        ? NetworkImage(profileImageUrl!)
-                        : null,
-                    child: profileImageUrl == null
-                        ? const Icon(Icons.person, size: 30, color: Colors.white)
-                        : null,
-                  ),
-                  title: Text(
-                    userName ?? "User name",
-                    style: const TextStyle(color: Colors.white),
-                  ),
-                  subtitle: Text(
-                    user?.email ?? "email@gmail.com",
-                    style: const TextStyle(color: Colors.white70),
-                  ),
-                  trailing: const Icon(Icons.notification_add, color: Colors.white),
-                ),
+                Obx(() {
+                  if (controller.isProfileloading.value) {
+                  return Center(child: CircularProgressIndicator(color: Colors.white));
+                }
+                      return ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: CircleAvatar(
+                      radius: 20,
+                      backgroundColor: const Color(0xff05243E),
+                      backgroundImage: controller.profileImageUrl.value != null
+                          ? NetworkImage(controller.profileImageUrl.value!)
+                          : null,
+                      child: controller.profileImageUrl.value == null
+                          ? const Icon(Icons.person, size: 30, color: Colors.white)
+                          : null,
+                    ),
+                    title: Text(
+                      controller.userName.value ?? "User name",
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                    subtitle: Text(
+                     controller.userEmail.value ?? "email@gmail.com",
+                      style: const TextStyle(color: Colors.white70),
+                    ),
+                    trailing: const Icon(Icons.notification_add, color: Colors.white),
+                  );
+                }),
                 SizedBox(height: 20,),
                 Text("Group Tasks", style: TextStyle(color: Colors.white,fontSize: 15),),
                 SizedBox(height: 10,),
@@ -110,20 +87,11 @@ class _HomescreenState extends State<Homescreen> {
 
                 SizedBox(height: 10,),
                 Expanded(
-                  child:
-                  StreamBuilder<QuerySnapshot>(
-                      stream: FirebaseFirestore.instance.collection("user")
-                          .doc(FirebaseAuth.instance.currentUser!.uid)
-                          .collection("task")
-                          .snapshots(),
-                        builder:(context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.waiting) {
+                  child: Obx((){
+                        if (controller.isloading.value) {
                           return Center(child: CircularProgressIndicator());
                         }
-                        if (snapshot.hasError) {
-                          return Text(snapshot.error.toString());
-                        }
-                        if (!snapshot.hasData) {
+                        if (controller.allTask.isEmpty) {
                           return Center(
                             child: Text(
                               "No Tasks Found",
@@ -132,13 +100,13 @@ class _HomescreenState extends State<Homescreen> {
                           );
                         }
 
-
-                        List<Task> alltask =snapshot.data!.docs.map((doc){
-                          return Task.fromJson(doc.data() as Map<String, dynamic>);
-                        }).toList();
-
-                        List<Task> incompletetask = alltask.where((task) => task.isCompleted == false).toList();
-                        List<Task> completetask = alltask.where((task) => task.isCompleted == true).toList();
+                        //
+                        // List<Task> alltask =snapshot.data!.docs.map((doc){
+                        //   return Task.fromJson(doc.data() as Map<String, dynamic>);
+                        // }).toList();
+                        //
+                        // List<Task> incompletetask = alltask.where((task) => task.isCompleted == false).toList();
+                        // List<Task> completetask = alltask.where((task) => task.isCompleted == true).toList();
 
                         return SingleChildScrollView(
                           child: Column(crossAxisAlignment: CrossAxisAlignment.start,
@@ -147,7 +115,7 @@ class _HomescreenState extends State<Homescreen> {
                                 padding: const EdgeInsets.only(left: 10),
                                 child: Text("InCompleted Task",style: TextStyle(color: Colors.white,fontSize: 15,fontWeight: FontWeight.bold),),
                               ),
-                              if(incompletetask.isEmpty)
+                              if(controller.incompleteTask.isEmpty)
                                 Padding(
                                   padding: const EdgeInsets.only(left: 10),
                                   child: Text("No InCompleted Task",style: TextStyle(color: Colors.green,fontSize: 15),),)
@@ -155,16 +123,16 @@ class _HomescreenState extends State<Homescreen> {
                               ListView.builder(
                                 shrinkWrap: true,
                                 physics: NeverScrollableScrollPhysics(),
-                                itemCount: incompletetask.length,
+                                itemCount: controller.incompleteTask.length,
                                 itemBuilder: (context, int index){
-                                  Task model =incompletetask[index];
+                                  Task model =controller.incompleteTask[index];
                                   return Card(
                                       child: ListTile(
                                         title:Text(model.title),
                                           trailing: IconButton(
                                             icon: Icon(Icons.arrow_forward_ios),
                                             onPressed: (){
-                                              Navigator.push(context, MaterialPageRoute<void>(builder: (context)=> TaskDetails(task: model)));
+                                             Get.to(TaskDetails(task: model));
                                               },
                                           ),
                                           subtitle: Row(
@@ -183,7 +151,7 @@ class _HomescreenState extends State<Homescreen> {
                                 padding: const EdgeInsets.only(left: 10),
                                 child: Text("Completed Task",style: TextStyle(color: Colors.white,fontSize: 15, fontWeight: FontWeight.bold),),
                               ),
-                              if(completetask.isEmpty)
+                              if(controller.completeTask.isEmpty)
                                 Padding(
                                   padding: const EdgeInsets.only(left: 10),
                                   child: Text("No Completed Task",style: TextStyle(color: Colors.green,fontSize: 15),),)
@@ -191,16 +159,16 @@ class _HomescreenState extends State<Homescreen> {
                               ListView.builder(
                                 shrinkWrap: true,
                                 physics: NeverScrollableScrollPhysics(),
-                                itemCount: completetask.length,
+                                itemCount: controller.completeTask.length,
                                 itemBuilder: (context, int index){
-                                  Task model =completetask[index];
+                                  Task model =controller.completeTask[index];
                                   return Card(
                                       child: ListTile(
                                         title:Text(model.title),
                                         trailing: IconButton(
                                           icon: Icon(Icons.arrow_forward_ios),
                                           onPressed: (){
-                                            Navigator.push(context, MaterialPageRoute<void>(builder: (context)=> TaskDetails(task: model)));
+                                          Get.to(TaskDetails(task: model));
 
                                           },
                                         ),
